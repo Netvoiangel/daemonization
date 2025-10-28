@@ -23,7 +23,12 @@ bool Daemon::init(const std::string &configPath) {
   g_daemon_ptr = this;
   openlog("daemonizer", LOG_PID | LOG_CONS, LOG_DAEMON);
 
-  pidFile = "/var/run/daemonizer.pid";
+  // Путь pid-файла: можно переопределить через переменную окружения DAEMONIZER_PID_FILE
+  if (const char *envPid = std::getenv("DAEMONIZER_PID_FILE")) {
+    pidFile = envPid;
+  } else {
+    pidFile = "/var/run/daemonizer.pid";
+  }
 
   if (!ensureSingleInstance(pidFile)) {
     syslog(LOG_ERR, "Another instance is running. Exiting.");

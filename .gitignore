@@ -1,0 +1,17 @@
+# Build artifacts
+/bin/
+/build/
+*.o
+
+# macOS
+.DS_Store
+
+# Editors/IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Others
+*.swp
