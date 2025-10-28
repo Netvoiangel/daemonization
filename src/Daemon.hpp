@@ -6,11 +6,9 @@ class Daemon {
 public:
   static Daemon &instance();
 
-  // Инициализация и запуск основного цикла
   bool init(const std::string &configPath);
   int run();
 
-  // Обработка сигналов
   static void handleSignal(int sig);
 
 private:

@@ -23,10 +23,8 @@ bool Daemon::init(const std::string &configPath) {
   g_daemon_ptr = this;
   openlog("daemonizer", LOG_PID | LOG_CONS, LOG_DAEMON);
 
-  // Путь pid-файла
   pidFile = "/var/run/daemonizer.pid";
 
-  // Проверка одиночности
   if (!ensureSingleInstance(pidFile)) {
     syslog(LOG_ERR, "Another instance is running. Exiting.");
     return false;
@@ -37,13 +35,11 @@ bool Daemon::init(const std::string &configPath) {
     return false;
   }
 
-  // После демонизации: записать свой pid
   if (!writePidFile(pidFile)) {
     syslog(LOG_ERR, "Failed to write pid file");
     return false;
   }
 
-  // Глобальные обработчики сигналов
   struct sigaction sa{};
   sa.sa_handler = Daemon::handleSignal;
   sigemptyset(&sa.sa_mask);
@@ -51,7 +47,6 @@ bool Daemon::init(const std::string &configPath) {
   sigaction(SIGHUP, &sa, nullptr);
   sigaction(SIGTERM, &sa, nullptr);
 
-  // Загрузить конфиг
   if (!Config::instance().loadFromFile(configPath)) {
     syslog(LOG_ERR, "Failed to load config at startup: %s", configPath.c_str());
     return false;
@@ -75,7 +70,6 @@ int Daemon::run() {
     CopyWorker::performOnce(Config::instance().getRules());
 
     unsigned int ms = Config::instance().getIntervalMs();
-    // sleep in small chunks to handle signals faster
     unsigned int slept = 0;
     while (slept < ms && !shouldTerminate && !shouldReload) {
       unsigned int chunk = 200; // ms
@@ -101,11 +95,10 @@ void Daemon::handleSignal(int sig) {
 bool Daemon::daemonize() {
   pid_t pid = fork();
   if (pid < 0) return false;
-  if (pid > 0) _exit(0); // родитель завершается
+  if (pid > 0) _exit(0); 
 
   if (setsid() < 0) return false;
 
-  // второй fork, чтобы не получить управляющий терминал
   pid = fork();
   if (pid < 0) return false;
   if (pid > 0) _exit(0);
@@ -113,12 +106,10 @@ bool Daemon::daemonize() {
   umask(0);
   chdir("/");
 
-  // закрыть стандартные файловые дескрипторы
   close(STDIN_FILENO);
   close(STDOUT_FILENO);
   close(STDERR_FILENO);
 
-  // переоткрыть их на /dev/null
   int fd = open("/dev/null", O_RDWR);
   if (fd >= 0) {
     dup2(fd, STDIN_FILENO);
@@ -130,7 +121,6 @@ bool Daemon::daemonize() {
 }
 
 static bool pidIsRunning(pid_t pid) {
-  // Проверка через /proc
   std::string path = "/proc/" + std::to_string(pid);
   struct stat st{};
   return ::stat(path.c_str(), &st) == 0 && S_ISDIR(st.st_mode);
@@ -143,9 +133,7 @@ bool Daemon::ensureSingleInstance(const std::string &pidFilePath) {
     pid_t oldPid = 0;
     ifs >> oldPid;
     if (oldPid > 0 && pidIsRunning(oldPid)) {
-      // отправить SIGTERM
       kill(oldPid, SIGTERM);
-      // дождаться завершения до 5 секунд
       for (int i = 0; i < 50; ++i) {
         if (!pidIsRunning(oldPid)) break;
         usleep(100000); // 100ms
