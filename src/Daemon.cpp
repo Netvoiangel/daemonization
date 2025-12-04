@@ -15,12 +15,15 @@
 #include <fstream>
 #include <string>
 
-static Daemon *g_daemon_ptr = nullptr;
+Daemon *Daemon::activeInstance = nullptr;
 
-Daemon &Daemon::instance() { static Daemon d; return d; }
+Daemon &Daemon::instance() {
+  static Daemon d;
+  return d;
+}
 
 bool Daemon::init(const std::string &configPath) {
-  g_daemon_ptr = this;
+  activeInstance = this;
   openlog("daemonizer", LOG_PID | LOG_CONS, LOG_DAEMON);
 
   // Путь pid-файла: можно переопределить через переменную окружения DAEMONIZER_PID_FILE
@@ -78,7 +81,9 @@ int Daemon::run() {
     unsigned int slept = 0;
     while (slept < ms && !shouldTerminate && !shouldReload) {
       unsigned int chunk = 200; // ms
-      if (ms - slept < chunk) chunk = ms - slept;
+      if (ms - slept < chunk) {
+        chunk = ms - slept;
+      }
       usleep(chunk * 1000);
       slept += chunk;
     }
@@ -89,24 +94,38 @@ int Daemon::run() {
 }
 
 void Daemon::handleSignal(int sig) {
-  if (!g_daemon_ptr) return;
+  Daemon *daemon = activeInstance;
+  if (!daemon) {
+    return;
+  }
+
   if (sig == SIGHUP) {
-    g_daemon_ptr->shouldReload = 1;
+    daemon->shouldReload = 1;
   } else if (sig == SIGTERM) {
-    g_daemon_ptr->shouldTerminate = 1;
+    daemon->shouldTerminate = 1;
   }
 }
 
 bool Daemon::daemonize() {
   pid_t pid = fork();
-  if (pid < 0) return false;
-  if (pid > 0) _exit(0); 
+  if (pid < 0) {
+    return false;
+  }
+  if (pid > 0) {
+    _exit(0);
+  }
 
-  if (setsid() < 0) return false;
+  if (setsid() < 0) {
+    return false;
+  }
 
   pid = fork();
-  if (pid < 0) return false;
-  if (pid > 0) _exit(0);
+  if (pid < 0) {
+    return false;
+  }
+  if (pid > 0) {
+    _exit(0);
+  }
 
   umask(0);
   chdir("/");
@@ -120,7 +139,9 @@ bool Daemon::daemonize() {
     dup2(fd, STDIN_FILENO);
     dup2(fd, STDOUT_FILENO);
     dup2(fd, STDERR_FILENO);
-    if (fd > 2) close(fd);
+    if (fd > 2) {
+      close(fd);
+    }
   }
   return true;
 }
@@ -140,7 +161,9 @@ bool Daemon::ensureSingleInstance(const std::string &pidFilePath) {
     if (oldPid > 0 && pidIsRunning(oldPid)) {
       kill(oldPid, SIGTERM);
       for (int i = 0; i < 50; ++i) {
-        if (!pidIsRunning(oldPid)) break;
+        if (!pidIsRunning(oldPid)) {
+          break;
+        }
         usleep(100000); // 100ms
       }
       if (pidIsRunning(oldPid)) {
@@ -154,7 +177,9 @@ bool Daemon::ensureSingleInstance(const std::string &pidFilePath) {
 
 bool Daemon::writePidFile(const std::string &pidFilePath) {
   std::ofstream ofs(pidFilePath, std::ios::trunc);
-  if (!ofs.is_open()) return false;
+  if (!ofs.is_open()) {
+    return false;
+  }
   ofs << getpid();
   return ofs.good();
 }

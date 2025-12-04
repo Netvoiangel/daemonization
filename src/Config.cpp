@@ -6,7 +6,10 @@
 #include <cstdlib>
 #include <string>
 
-Config &Config::instance() { static Config cfg; return cfg; }
+Config &Config::instance() {
+  static Config cfg;
+  return cfg;
+}
 
 bool Config::loadFromFile(const std::string &path) {
   std::string abs = utils::toAbsolutePath(path);
@@ -15,7 +18,9 @@ bool Config::loadFromFile(const std::string &path) {
     syslog(LOG_ERR, "Failed to read config file: %s", abs.c_str());
     return false;
   }
-  if (!parse(content)) return false;
+  if (!parse(content)) {
+    return false;
+  }
   configPathAbs = abs;
   return true;
 }
@@ -35,11 +40,15 @@ bool Config::parse(const std::string &content) {
   size_t pos = 0;
   while (pos < buf.size()) {
     size_t end = buf.find('\n', pos);
-    if (end == std::string::npos) end = buf.size();
+    if (end == std::string::npos) {
+      end = buf.size();
+    }
     line = buf.substr(pos, end - pos);
     utils::trimWhitespace(line);
     pos = end + 1;
-    if (line.empty() || line[0] == '#') continue;
+    if (line.empty() || line[0] == '#') {
+      continue;
+    }
 
     // interval=<ms>
     const std::string prefix = "interval=";
@@ -63,7 +72,9 @@ bool Config::parse(const std::string &content) {
       r.sourceDir = utils::toAbsolutePath(tokens[0]);
       r.destDir = utils::toAbsolutePath(tokens[1]);
       r.extension = tokens[2];
-      if (!r.extension.empty() && r.extension[0] == '.') r.extension.erase(0, 1);
+      if (!r.extension.empty() && r.extension[0] == '.') {
+        r.extension.erase(0, 1);
+      }
       rules.push_back(r);
     } else {
       syslog(LOG_WARNING, "Invalid rule line: %s", line.c_str());

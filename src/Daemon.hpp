@@ -1,5 +1,6 @@
 #pragma once
 
+#include <csignal>
 #include <string>
 
 class Daemon {
@@ -21,6 +22,7 @@ private:
   volatile sig_atomic_t shouldReload{0};
 
   std::string pidFile;
+  static Daemon *activeInstance;
 };
 
 

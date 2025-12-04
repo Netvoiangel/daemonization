@@ -31,7 +31,9 @@ compile() {
     g++ "${cxxflags[@]}" -c "$src" -o "$obj"
   done
 
+  set +u
   g++ "${cxxflags[@]}" "${objs[@]}" -o "$TARGET" "${ldflags[@]}"
+  set -u
 }
 
 case "${1:-build}" in
