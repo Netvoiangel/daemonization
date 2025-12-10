@@ -1,0 +1,1 @@
+/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/host_shm.dir/src/host.cpp.o CMakeFiles/host_shm.dir/src/common.cpp.o CMakeFiles/host_shm.dir/src/ipc_utils.cpp.o CMakeFiles/host_shm.dir/src/logging.cpp.o CMakeFiles/host_shm.dir/src/wolf_game.cpp.o CMakeFiles/host_shm.dir/src/conn_shm.cpp.o -o host_shm
