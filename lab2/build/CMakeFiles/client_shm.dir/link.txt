@@ -1,0 +1,1 @@
+/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/client_shm.dir/src/client.cpp.o CMakeFiles/client_shm.dir/src/common.cpp.o CMakeFiles/client_shm.dir/src/ipc_utils.cpp.o CMakeFiles/client_shm.dir/src/logging.cpp.o CMakeFiles/client_shm.dir/src/wolf_game.cpp.o CMakeFiles/client_shm.dir/src/conn_shm.cpp.o -o client_shm

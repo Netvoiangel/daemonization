@@ -1,0 +1,8 @@
+/Users/w6itec6apel/Github/daemonization/lab2/build/CMakeFiles/host_fifo.dir
+/Users/w6itec6apel/Github/daemonization/lab2/build/CMakeFiles/client_fifo.dir
+/Users/w6itec6apel/Github/daemonization/lab2/build/CMakeFiles/host_mmap.dir
+/Users/w6itec6apel/Github/daemonization/lab2/build/CMakeFiles/client_mmap.dir
+/Users/w6itec6apel/Github/daemonization/lab2/build/CMakeFiles/host_shm.dir
+/Users/w6itec6apel/Github/daemonization/lab2/build/CMakeFiles/client_shm.dir
+/Users/w6itec6apel/Github/daemonization/lab2/build/CMakeFiles/edit_cache.dir
+/Users/w6itec6apel/Github/daemonization/lab2/build/CMakeFiles/rebuild_cache.dir

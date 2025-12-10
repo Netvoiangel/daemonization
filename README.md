@@ -63,4 +63,3 @@ sudo kill -TERM $(cat /var/run/daemonizer.pid)
 - Очистка: `bash build.sh clean`
 - Пересборка: `bash build.sh build`
 
-
